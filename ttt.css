@@ -1,0 +1,30 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+.game-container {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    align-items: center;
+    height: 720px;
+    width: 720px;
+    
+}
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 20px;
+    background-color: red;
+    height: 100%;
+    width: 100%;
+}
+
+.grid-square {
+    background-color: blanchedalmond;
+    height: 100%;
+    width: 100%;
+    font-size: 5rem;
+}
