@@ -47,7 +47,6 @@ const GameBoard = (function (){
         posXY = [["","",""],
                  ["","",""],
                  ["","",""]];
-        gameAvailable = true;
         displayBoard();
     }
 
@@ -125,6 +124,9 @@ const GameBoard = (function (){
     }
 
     const getMoveCount = () => moveCount;
+    const resetMoveCount = () => {
+        moveCount = 0;
+    }
     
 
     return {
@@ -134,6 +136,7 @@ const GameBoard = (function (){
         checkValidMove,
         checkGameState,
         getMoveCount,
+        resetMoveCount,
         gameAvailable
 
     }
@@ -157,33 +160,49 @@ const GameFlow = (function(){
 /*  Player object to create 2 players */
 
 function createPlayer(name, marker, playerTurn) {
-        
+
+
     return {
         name, marker, playerTurn
     }
 }
 
-const Player1 = createPlayer("Player 1", "X", true);
-const Player2 = createPlayer("Player 2", "O", false);
+let player1name = document.querySelector("#p1").placeholder;
+let player2name = document.querySelector("#p2").placeholder;
+
+const Player1 = createPlayer(player1name, "X", true);
+const Player2 = createPlayer(player2name, "O", false);
 
 
 
 let gridSquares = document.querySelectorAll(".grid-square");
 let clearButton = document.querySelector(".clear-button");
 let gameStateText = document.querySelector(".game-state");
+let updateNameBtn = document.querySelector(".update-names");
 
-gameStateText.textContent = "Player 1 goes first!";
+gameStateText.textContent = Player1.name + " goes first!";
 
 console.log("Player 1 turn: " + Player1.playerTurn);
 
 GameBoard.displayBoard();
+
+updateNameBtn.addEventListener('click', (e) => { 
+    if (document.querySelector("#p1").value != "")
+        Player1.name = document.querySelector("#p1").value;
+
+    if (document.querySelector("#p2").value != "")
+        Player2.name = document.querySelector("#p2").value;
+
+});
+
 
 for (let r = 0; r < 3; r++) {
     for (let c = 0; c < 3; c++) {
         let squareID = r*3 + c;
         gridSquares[squareID].addEventListener('click', (e) => {
             console.log (squareID);
-            if(!GameBoard.gameAvailable)
+            console.log(GameBoard.gameAvailable);
+            if(GameBoard.gameAvailable)
             {
                 if(GameBoard.checkValidMove(squareID))
                 {
@@ -192,35 +211,51 @@ for (let r = 0; r < 3; r++) {
                     {
                         GameBoard.updateBoard(squareID, Player1.marker);
                         if(GameBoard.checkGameState(squareID,Player1.marker)){
-                            console.log("Player 1 wins!");
-                            gameStateText.textContent = "Player 1 wins!";
+                            console.log(Player1.name + " wins!");
+                            gameStateText.textContent = Player1.name + " (X) wins!";
                             GameBoard.gameAvailable = false;
                         }
                         else {
-    
-                            Player1.playerTurn = false;
-                            Player2.playerTurn = true;
-                            console.log("Player 1 turn: " + Player1.playerTurn);
-                            console.log("Player 2 turn: " + Player2.playerTurn);
-    
-                            gameStateText.textContent = "Player 2's turn";
+                            if (GameBoard.getMoveCount() == 9) {
+                                console.log("It's a tie");
+                                gameStateText.textContent = "It's a tie!";
+                                GameBoard.gameAvailable = false;
+                            }
+
+                            else {
+                                Player1.playerTurn = false;
+                                Player2.playerTurn = true;
+                                console.log("Player 1 turn: " + Player1.playerTurn);
+                                console.log("Player 2 turn: " + Player2.playerTurn);
+        
+                                gameStateText.textContent = Player2.name + "'s (O) turn";
+                            }
+
                         }
                     }
                     else {
                         GameBoard.updateBoard(squareID, Player2.marker);
                         if(GameBoard.checkGameState(squareID,Player2.marker)){
                             console.log("Player 2 wins!");
-                            gameStateText.textContent = "Player 2 wins!";
+                            gameStateText.textContent = Player2.name + " (O) wins!";
                             GameBoard.gameAvailable = false;
                         }
                         else {
-                            Player1.playerTurn = true;
-                            Player2.playerTurn = false;
-        
-                            console.log("Player 1 turn: " + Player1.playerTurn);
-                            console.log("Player 2 turn: " + Player2.playerTurn);
-        
-                            gameStateText.textContent = "Player 1's turn";
+                            if (GameBoard.getMoveCount() == 9) {
+                                console.log("It's a tie");
+                                gameStateText.textContent = "It's a tie!";
+                                GameBoard.gameAvailable = false;
+                            }
+
+                            else {
+                                Player1.playerTurn = true;
+                                Player2.playerTurn = false;
+            
+                                console.log("Player 1 turn: " + Player1.playerTurn);
+                                console.log("Player 2 turn: " + Player2.playerTurn);
+            
+                                gameStateText.textContent = Player1.name + "'s (X) turn";
+                            }
                         }
     
     
@@ -239,8 +274,10 @@ for (let r = 0; r < 3; r++) {
 clearButton.addEventListener('click', (e) => {
     console.log ("Clear");
     GameBoard.clearBoard();
+    GameBoard.resetMoveCount();
+    GameBoard.gameAvailable = true;
     Player1.playerTurn = true;
     Player2.playerTurn = false;
-    gameStateText.textContent = "Player 1 goes first!";
+    gameStateText.textContent = Player1.name + " goes first!";
 
 });
